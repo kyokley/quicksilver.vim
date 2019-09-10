@@ -46,8 +46,10 @@ import os
 import re
 import sys
 import vim
+import functools
 
-class QuicksilverConst(object):
+
+class QuicksilverConst:
     # Users may set a global variable containing regexps of filenames that
     # should be ignored. For example, to ignore .pyc and .swp files, one
     # could add the following line to their .vimrc file:
@@ -67,28 +69,32 @@ class QuicksilverConst(object):
 
     # Platform-specific root directories.
     if sys.platform == "win32":
-        ROOTS = ["{0}:\\".format(chr(drive)) for drive in range(ord("A"), ord("Z"))]
+        ROOTS = [
+            "{0}:\\".format(chr(drive))
+            for drive in range(ord("A"), ord("Z"))]
     else:
         ROOTS = (os.sep,)
 
     # The string by which the matches should be separated.
     SEPARATOR = " | "
 
-    # When this string is selected from the matches, quicksilver must go up a dir.
+    # When this string is selected from the matches,
+    # quicksilver must go up a dir.
     UPDIR = "..{0}".format(os.sep)
 
-class QuicksilverUtil(object):
+
+class QuicksilverUtil:
     @classmethod
     def compare_files(cls, first, second):
         """Compares two file names so that files that start with a dot are
         heavier than normal files."""
-        if first.startswith(".") and not \
-           second.startswith("."):
-           return 1
-        if not first.startswith(".") and \
-           second.startswith("."):
-           return -1
-        return cmp(first, second)
+        if first.startswith(".") and not second.startswith("."):
+            return 1
+        if not first.startswith(".") and second.startswith("."):
+            return -1
+        if first == second:
+            return 0
+        return -1 if first < second else 1
 
     @classmethod
     def update_cursor(cls, qs):
@@ -128,6 +134,7 @@ class QuicksilverUtil(object):
         "Checks whether or not the given filename is the updir string."
         return filename == QuicksilverConst.UPDIR
 
+
 class QuicksilverMatcher(object):
     @classmethod
     def fuzzy(cls, qs, filename):
@@ -147,6 +154,7 @@ class QuicksilverMatcher(object):
         pattern, filename = qs.normalize_case(filename)
         return pattern in filename
 
+
 class Quicksilver(object):
     def __init__(self, matcher='normal'):
         self.set_matcher(matcher)
@@ -160,7 +168,7 @@ class Quicksilver(object):
         "Change the drive on Windows systems."
         drive = "{0}:\\".format(drive.upper())
         if sys.platform != 'win32' \
-        or not os.path.isdir(drive):
+                or not os.path.isdir(drive):
             return
         self.clear()
         self.cwd = drive
@@ -168,8 +176,10 @@ class Quicksilver(object):
 
     def set_ignore_case(self, ignore_case):
         "Setter for the ignore_case property."
-        try: self.ignore_case = int(ignore_case)
-        except ValueError: self.ignore_case = True
+        try:
+            self.ignore_case = int(ignore_case)
+        except ValueError:
+            self.ignore_case = True
 
     def toggle_ignore_case(self):
         "Toggles the value of the ignore_case property."
@@ -208,12 +218,16 @@ class Quicksilver(object):
         passed. It also sorts the matched files."""
         files = []
         for filename in os.listdir(self.cwd):
-            if not self.matcher(self, filename): continue
-            if QuicksilverUtil.is_ignored(filename): continue
+            if not self.matcher(self, filename):
+                continue
+            if QuicksilverUtil.is_ignored(filename):
+                continue
             if os.path.isdir(self.rel(filename)):
                 filename = "{0}{1}".format(filename, os.sep)
             files.append(filename)
-        return sorted(files, cmp=QuicksilverUtil.compare_files)
+        return sorted(
+            files,
+            key=functools.cmp_to_key(QuicksilverUtil.compare_files))
 
     def match_files(self):
         "Gets and indexes the matched files."
@@ -264,7 +278,7 @@ class Quicksilver(object):
     def clear_pattern(self):
         """Similar to a normal clear but it also goes up a dir if there is no
         pattern to clear."""
-        if not self.pattern and not self.cwd in QuicksilverConst.ROOTS:
+        if not self.pattern and self.cwd not in QuicksilverConst.ROOTS:
             self.cwd = self.get_parent(self.cwd + os.sep)
         self.clear()
 
@@ -305,13 +319,15 @@ class Quicksilver(object):
             if self.pattern.endswith(os.sep):
                 os.mkdir(path)
             if self.pattern.startswith("*") \
-            or self.pattern.endswith("*"):
+                    or self.pattern.endswith("*"):
                 return list(self.glob(path))
             return path
 
     def open_on_tab(self):
-        if len(self.match_files()) == 1: self.open()
-        else: self.increase_index()
+        if len(self.match_files()) == 1:
+            self.open()
+        else:
+            self.increase_index()
 
     def open_list(self, paths):
         QuicksilverUtil.close_buffer()
