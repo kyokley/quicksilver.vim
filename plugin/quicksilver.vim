@@ -31,7 +31,7 @@
 " ======================================================================
 
 "{{{ Initial checks
-if exists("g:loaded_quicksilver") || !has("python") || &cp
+if exists("g:loaded_quicksilver") || !has("python3") || &cp
     finish
 endif
 if !exists("g:QSIgnore")
@@ -40,7 +40,7 @@ endif
 let g:loaded_quicksilver = 1
 "}}}
 "{{{ Python code
-python <<EOF
+python3 <<EOF
 import glob
 import os
 import re
@@ -64,7 +64,7 @@ class QuicksilverConst(object):
 
     # Files and folders that should never appear in the list of matches.
     IGNORED = ["^\\$Recycle\\.Bin$", ".*\\.sw.+$"] + USER_IGNORED
-    
+
     # Platform-specific root directories.
     if sys.platform == "win32":
         ROOTS = ["{0}:\\".format(chr(drive)) for drive in range(ord("A"), ord("Z"))]
@@ -333,7 +333,7 @@ class Quicksilver(object):
         self.index = 0
         if isinstance(path, list):
             return self.open_list(path)
-        if os.path.isdir(path): 
+        if os.path.isdir(path):
             return self.open_dir(path)
         return self.open_file(path)
 EOF
@@ -341,143 +341,143 @@ EOF
 "{{{ Public interface
 "{{{ Initialize Quicksilver object
 if exists('g:QSMatchFn')
-    python quicksilver = Quicksilver(vim.eval('g:QSMatchFn'))
+    python3 quicksilver = Quicksilver(vim.eval('g:QSMatchFn'))
 else
-    python quicksilver = Quicksilver()
+    python3 quicksilver = Quicksilver()
 endif
 "}}}
 function! s:MapKeys() "{{{
-    imap <silent><buffer><SPACE> :python quicksilver.update(' ')<CR>
-    map  <silent><buffer><C-c> :python QuicksilverUtil.close_buffer()<CR>
-    imap <silent><buffer><C-c> :python QuicksilverUtil.close_buffer()<CR>
-    imap <silent><buffer><C-w> :python quicksilver.clear_pattern()<CR>
-    map  <silent><buffer><C-f> :python quicksilver.set_matcher("fuzzy")<CR>
-    imap <silent><buffer><C-f> :python quicksilver.set_matcher("fuzzy")<CR>
-    map  <silent><buffer><C-n> :python quicksilver.set_matcher("normal")<CR>
-    imap <silent><buffer><C-n> :python quicksilver.set_matcher("normal")<CR>
-    map  <silent><buffer><C-t> :python quicksilver.toggle_ignore_case()<CR>
-    imap <silent><buffer><C-t> :python quicksilver.toggle_ignore_case()<CR>
-    map  <silent><buffer><TAB> :python quicksilver.open_on_tab()<CR>
-    imap <silent><buffer><TAB> :python quicksilver.open_on_tab()<CR>
-    map  <silent><buffer><S-TAB> :python quicksilver.decrease_index()<CR>
-    imap <silent><buffer><S-TAB> :python quicksilver.decrease_index()<CR>
-    imap <silent><buffer><BAR> :python quicksilver.update('\|')<CR>
-    map  <silent><buffer><CR> :python quicksilver.open()<CR>
-    imap <silent><buffer><CR> :python quicksilver.open()<CR>
-    imap <silent><buffer><BS> :python quicksilver.on_backspace()<CR>
-    imap <silent><buffer>! :python quicksilver.update('!')<CR>
-    imap <silent><buffer>" :python quicksilver.update('"')<CR>
-    imap <silent><buffer># :python quicksilver.update('#')<CR>
-    imap <silent><buffer>$ :python quicksilver.update('$')<CR>
-    imap <silent><buffer>% :python quicksilver.update('%')<CR>
-    imap <silent><buffer>& :python quicksilver.update('&')<CR>
-    imap <silent><buffer>' :python quicksilver.update(''')<CR>
-    imap <silent><buffer>( :python quicksilver.update('(')<CR>
-    imap <silent><buffer>) :python quicksilver.update(')')<CR>
-    imap <silent><buffer>* :python quicksilver.update('*')<CR>
-    imap <silent><buffer>+ :python quicksilver.update('+')<CR>
-    imap <silent><buffer>, :python quicksilver.update(',')<CR>
-    imap <silent><buffer>- :python quicksilver.update('-')<CR>
-    imap <silent><buffer>. :python quicksilver.update('.')<CR>
-    imap <silent><buffer>/ :python quicksilver.update('/')<CR>
-    imap <silent><buffer>0 :python quicksilver.update('0')<CR>
-    imap <silent><buffer>1 :python quicksilver.update('1')<CR>
-    imap <silent><buffer>2 :python quicksilver.update('2')<CR>
-    imap <silent><buffer>3 :python quicksilver.update('3')<CR>
-    imap <silent><buffer>4 :python quicksilver.update('4')<CR>
-    imap <silent><buffer>5 :python quicksilver.update('5')<CR>
-    imap <silent><buffer>6 :python quicksilver.update('6')<CR>
-    imap <silent><buffer>7 :python quicksilver.update('7')<CR>
-    imap <silent><buffer>8 :python quicksilver.update('8')<CR>
-    imap <silent><buffer>9 :python quicksilver.update('9')<CR>
-    imap <silent><buffer>: :python quicksilver.update(':')<CR>
-    imap <silent><buffer>; :python quicksilver.update(';')<CR>
-    imap <silent><buffer>< :python quicksilver.update('<')<CR>
-    imap <silent><buffer>= :python quicksilver.update('=')<CR>
-    imap <silent><buffer>> :python quicksilver.update('>')<CR>
-    imap <silent><buffer>? :python quicksilver.update('?')<CR>
-    imap <silent><buffer>@ :python quicksilver.update('@')<CR>
-    imap <silent><buffer>A :python quicksilver.update('A')<CR>
-    imap <silent><buffer>B :python quicksilver.update('B')<CR>
-    imap <silent><buffer>C :python quicksilver.update('C')<CR>
-    imap <silent><buffer>D :python quicksilver.update('D')<CR>
-    imap <silent><buffer>E :python quicksilver.update('E')<CR>
-    imap <silent><buffer>F :python quicksilver.update('F')<CR>
-    imap <silent><buffer>G :python quicksilver.update('G')<CR>
-    imap <silent><buffer>H :python quicksilver.update('H')<CR>
-    imap <silent><buffer>I :python quicksilver.update('I')<CR>
-    imap <silent><buffer>J :python quicksilver.update('J')<CR>
-    imap <silent><buffer>K :python quicksilver.update('K')<CR>
-    imap <silent><buffer>L :python quicksilver.update('L')<CR>
-    imap <silent><buffer>M :python quicksilver.update('M')<CR>
-    imap <silent><buffer>N :python quicksilver.update('N')<CR>
-    imap <silent><buffer>O :python quicksilver.update('O')<CR>
-    imap <silent><buffer>P :python quicksilver.update('P')<CR>
-    imap <silent><buffer>Q :python quicksilver.update('Q')<CR>
-    imap <silent><buffer>R :python quicksilver.update('R')<CR>
-    imap <silent><buffer>S :python quicksilver.update('S')<CR>
-    imap <silent><buffer>T :python quicksilver.update('T')<CR>
-    imap <silent><buffer>U :python quicksilver.update('U')<CR>
-    imap <silent><buffer>V :python quicksilver.update('V')<CR>
-    imap <silent><buffer>W :python quicksilver.update('W')<CR>
-    imap <silent><buffer>X :python quicksilver.update('X')<CR>
-    imap <silent><buffer>Y :python quicksilver.update('Y')<CR>
-    imap <silent><buffer>Z :python quicksilver.update('Z')<CR>
-    imap <silent><buffer>[ :python quicksilver.update('[')<CR>
-    imap <silent><buffer>\ :python quicksilver.update('\\')<CR>
-    imap <silent><buffer>] :python quicksilver.update(']')<CR>
-    imap <silent><buffer>^ :python quicksilver.update('^')<CR>
-    imap <silent><buffer>_ :python quicksilver.update('_')<CR>
-    imap <silent><buffer>` :python quicksilver.update('`')<CR>
-    imap <silent><buffer>a :python quicksilver.update('a')<CR>
-    imap <silent><buffer>b :python quicksilver.update('b')<CR>
-    imap <silent><buffer>c :python quicksilver.update('c')<CR>
-    imap <silent><buffer>d :python quicksilver.update('d')<CR>
-    imap <silent><buffer>e :python quicksilver.update('e')<CR>
-    imap <silent><buffer>f :python quicksilver.update('f')<CR>
-    imap <silent><buffer>g :python quicksilver.update('g')<CR>
-    imap <silent><buffer>h :python quicksilver.update('h')<CR>
-    imap <silent><buffer>i :python quicksilver.update('i')<CR>
-    imap <silent><buffer>j :python quicksilver.update('j')<CR>
-    imap <silent><buffer>k :python quicksilver.update('k')<CR>
-    imap <silent><buffer>l :python quicksilver.update('l')<CR>
-    imap <silent><buffer>m :python quicksilver.update('m')<CR>
-    imap <silent><buffer>n :python quicksilver.update('n')<CR>
-    imap <silent><buffer>o :python quicksilver.update('o')<CR>
-    imap <silent><buffer>p :python quicksilver.update('p')<CR>
-    imap <silent><buffer>q :python quicksilver.update('q')<CR>
-    imap <silent><buffer>r :python quicksilver.update('r')<CR>
-    imap <silent><buffer>s :python quicksilver.update('s')<CR>
-    imap <silent><buffer>t :python quicksilver.update('t')<CR>
-    imap <silent><buffer>u :python quicksilver.update('u')<CR>
-    imap <silent><buffer>v :python quicksilver.update('v')<CR>
-    imap <silent><buffer>w :python quicksilver.update('w')<CR>
-    imap <silent><buffer>x :python quicksilver.update('x')<CR>
-    imap <silent><buffer>y :python quicksilver.update('y')<CR>
-    imap <silent><buffer>z :python quicksilver.update('z')<CR>
-    imap <silent><buffer>{ :python quicksilver.update('{')<CR>
-    imap <silent><buffer>} :python quicksilver.update('}')<CR>
-    imap <silent><buffer>~ :python quicksilver.update('~')<CR>
-endfunction "}}} 
+    imap <silent><buffer><SPACE> :python3 quicksilver.update(' ')<CR>
+    map  <silent><buffer><C-c> :python3 QuicksilverUtil.close_buffer()<CR>
+    imap <silent><buffer><C-c> :python3 QuicksilverUtil.close_buffer()<CR>
+    imap <silent><buffer><C-w> :python3 quicksilver.clear_pattern()<CR>
+    map  <silent><buffer><C-f> :python3 quicksilver.set_matcher("fuzzy")<CR>
+    imap <silent><buffer><C-f> :python3 quicksilver.set_matcher("fuzzy")<CR>
+    map  <silent><buffer><C-n> :python3 quicksilver.set_matcher("normal")<CR>
+    imap <silent><buffer><C-n> :python3 quicksilver.set_matcher("normal")<CR>
+    map  <silent><buffer><C-t> :python3 quicksilver.toggle_ignore_case()<CR>
+    imap <silent><buffer><C-t> :python3 quicksilver.toggle_ignore_case()<CR>
+    map  <silent><buffer><TAB> :python3 quicksilver.open_on_tab()<CR>
+    imap <silent><buffer><TAB> :python3 quicksilver.open_on_tab()<CR>
+    map  <silent><buffer><S-TAB> :python3 quicksilver.decrease_index()<CR>
+    imap <silent><buffer><S-TAB> :python3 quicksilver.decrease_index()<CR>
+    imap <silent><buffer><BAR> :python3 quicksilver.update('\|')<CR>
+    map  <silent><buffer><CR> :python3 quicksilver.open()<CR>
+    imap <silent><buffer><CR> :python3 quicksilver.open()<CR>
+    imap <silent><buffer><BS> :python3 quicksilver.on_backspace()<CR>
+    imap <silent><buffer>! :python3 quicksilver.update('!')<CR>
+    imap <silent><buffer>" :python3 quicksilver.update('"')<CR>
+    imap <silent><buffer># :python3 quicksilver.update('#')<CR>
+    imap <silent><buffer>$ :python3 quicksilver.update('$')<CR>
+    imap <silent><buffer>% :python3 quicksilver.update('%')<CR>
+    imap <silent><buffer>& :python3 quicksilver.update('&')<CR>
+    imap <silent><buffer>' :python3 quicksilver.update(''')<CR>
+    imap <silent><buffer>( :python3 quicksilver.update('(')<CR>
+    imap <silent><buffer>) :python3 quicksilver.update(')')<CR>
+    imap <silent><buffer>* :python3 quicksilver.update('*')<CR>
+    imap <silent><buffer>+ :python3 quicksilver.update('+')<CR>
+    imap <silent><buffer>, :python3 quicksilver.update(',')<CR>
+    imap <silent><buffer>- :python3 quicksilver.update('-')<CR>
+    imap <silent><buffer>. :python3 quicksilver.update('.')<CR>
+    imap <silent><buffer>/ :python3 quicksilver.update('/')<CR>
+    imap <silent><buffer>0 :python3 quicksilver.update('0')<CR>
+    imap <silent><buffer>1 :python3 quicksilver.update('1')<CR>
+    imap <silent><buffer>2 :python3 quicksilver.update('2')<CR>
+    imap <silent><buffer>3 :python3 quicksilver.update('3')<CR>
+    imap <silent><buffer>4 :python3 quicksilver.update('4')<CR>
+    imap <silent><buffer>5 :python3 quicksilver.update('5')<CR>
+    imap <silent><buffer>6 :python3 quicksilver.update('6')<CR>
+    imap <silent><buffer>7 :python3 quicksilver.update('7')<CR>
+    imap <silent><buffer>8 :python3 quicksilver.update('8')<CR>
+    imap <silent><buffer>9 :python3 quicksilver.update('9')<CR>
+    imap <silent><buffer>: :python3 quicksilver.update(':')<CR>
+    imap <silent><buffer>; :python3 quicksilver.update(';')<CR>
+    imap <silent><buffer>< :python3 quicksilver.update('<')<CR>
+    imap <silent><buffer>= :python3 quicksilver.update('=')<CR>
+    imap <silent><buffer>> :python3 quicksilver.update('>')<CR>
+    imap <silent><buffer>? :python3 quicksilver.update('?')<CR>
+    imap <silent><buffer>@ :python3 quicksilver.update('@')<CR>
+    imap <silent><buffer>A :python3 quicksilver.update('A')<CR>
+    imap <silent><buffer>B :python3 quicksilver.update('B')<CR>
+    imap <silent><buffer>C :python3 quicksilver.update('C')<CR>
+    imap <silent><buffer>D :python3 quicksilver.update('D')<CR>
+    imap <silent><buffer>E :python3 quicksilver.update('E')<CR>
+    imap <silent><buffer>F :python3 quicksilver.update('F')<CR>
+    imap <silent><buffer>G :python3 quicksilver.update('G')<CR>
+    imap <silent><buffer>H :python3 quicksilver.update('H')<CR>
+    imap <silent><buffer>I :python3 quicksilver.update('I')<CR>
+    imap <silent><buffer>J :python3 quicksilver.update('J')<CR>
+    imap <silent><buffer>K :python3 quicksilver.update('K')<CR>
+    imap <silent><buffer>L :python3 quicksilver.update('L')<CR>
+    imap <silent><buffer>M :python3 quicksilver.update('M')<CR>
+    imap <silent><buffer>N :python3 quicksilver.update('N')<CR>
+    imap <silent><buffer>O :python3 quicksilver.update('O')<CR>
+    imap <silent><buffer>P :python3 quicksilver.update('P')<CR>
+    imap <silent><buffer>Q :python3 quicksilver.update('Q')<CR>
+    imap <silent><buffer>R :python3 quicksilver.update('R')<CR>
+    imap <silent><buffer>S :python3 quicksilver.update('S')<CR>
+    imap <silent><buffer>T :python3 quicksilver.update('T')<CR>
+    imap <silent><buffer>U :python3 quicksilver.update('U')<CR>
+    imap <silent><buffer>V :python3 quicksilver.update('V')<CR>
+    imap <silent><buffer>W :python3 quicksilver.update('W')<CR>
+    imap <silent><buffer>X :python3 quicksilver.update('X')<CR>
+    imap <silent><buffer>Y :python3 quicksilver.update('Y')<CR>
+    imap <silent><buffer>Z :python3 quicksilver.update('Z')<CR>
+    imap <silent><buffer>[ :python3 quicksilver.update('[')<CR>
+    imap <silent><buffer>\ :python3 quicksilver.update('\\')<CR>
+    imap <silent><buffer>] :python3 quicksilver.update(']')<CR>
+    imap <silent><buffer>^ :python3 quicksilver.update('^')<CR>
+    imap <silent><buffer>_ :python3 quicksilver.update('_')<CR>
+    imap <silent><buffer>` :python3 quicksilver.update('`')<CR>
+    imap <silent><buffer>a :python3 quicksilver.update('a')<CR>
+    imap <silent><buffer>b :python3 quicksilver.update('b')<CR>
+    imap <silent><buffer>c :python3 quicksilver.update('c')<CR>
+    imap <silent><buffer>d :python3 quicksilver.update('d')<CR>
+    imap <silent><buffer>e :python3 quicksilver.update('e')<CR>
+    imap <silent><buffer>f :python3 quicksilver.update('f')<CR>
+    imap <silent><buffer>g :python3 quicksilver.update('g')<CR>
+    imap <silent><buffer>h :python3 quicksilver.update('h')<CR>
+    imap <silent><buffer>i :python3 quicksilver.update('i')<CR>
+    imap <silent><buffer>j :python3 quicksilver.update('j')<CR>
+    imap <silent><buffer>k :python3 quicksilver.update('k')<CR>
+    imap <silent><buffer>l :python3 quicksilver.update('l')<CR>
+    imap <silent><buffer>m :python3 quicksilver.update('m')<CR>
+    imap <silent><buffer>n :python3 quicksilver.update('n')<CR>
+    imap <silent><buffer>o :python3 quicksilver.update('o')<CR>
+    imap <silent><buffer>p :python3 quicksilver.update('p')<CR>
+    imap <silent><buffer>q :python3 quicksilver.update('q')<CR>
+    imap <silent><buffer>r :python3 quicksilver.update('r')<CR>
+    imap <silent><buffer>s :python3 quicksilver.update('s')<CR>
+    imap <silent><buffer>t :python3 quicksilver.update('t')<CR>
+    imap <silent><buffer>u :python3 quicksilver.update('u')<CR>
+    imap <silent><buffer>v :python3 quicksilver.update('v')<CR>
+    imap <silent><buffer>w :python3 quicksilver.update('w')<CR>
+    imap <silent><buffer>x :python3 quicksilver.update('x')<CR>
+    imap <silent><buffer>y :python3 quicksilver.update('y')<CR>
+    imap <silent><buffer>z :python3 quicksilver.update('z')<CR>
+    imap <silent><buffer>{ :python3 quicksilver.update('{')<CR>
+    imap <silent><buffer>} :python3 quicksilver.update('}')<CR>
+    imap <silent><buffer>~ :python3 quicksilver.update('~')<CR>
+endfunction "}}}
 function! s:HighlightSuggestions() "{{{
     hi link Suggestions Special
     match Suggestions   /\s*{[^}]*}/
 endfunction "}}}
 function! s:SetIgnoreCase(value) "{{{
-    python quicksilver.set_ignore_case(vim.eval('a:value'))
+    python3 quicksilver.set_ignore_case(vim.eval('a:value'))
 endfunction "}}}
 function! s:SetMatchFn(type) "{{{
-    python quicksilver.set_matcher(vim.eval('a:type'))
+    python3 quicksilver.set_matcher(vim.eval('a:type'))
 endfunction "}}}
 function! s:ChangeDrive() "{{{
-    python quicksilver.change_drive(vim.eval('input("Enter a drive letter: ")'))
+    python3 quicksilver.change_drive(vim.eval('input("Enter a drive letter: ")'))
 endfunction "}}}
 function! s:ActivateQS() "{{{
     let g:QSRestoreWindows = winrestcmd()
     execute 'bo 2 new'
     setlocal buftype=nofile
     setlocal wrap
-    python quicksilver.clear()
+    python3 quicksilver.clear()
     call s:MapKeys()
     call s:HighlightSuggestions()
 endfunction "}}}
